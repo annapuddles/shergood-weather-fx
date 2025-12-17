@@ -2,6 +2,8 @@
 
 Shergood Weather FX is a system that changes the environment based on the Shergood Weather 2.0 METAR data for the nearest registered airport. It modifies environment settings and uses particles and sounds to simulate different weather conditions.
 
+To see an example of this system in action, visit here: http://maps.secondlife.com/secondlife/Helgi/180/9/21
+
 # Components
 
 ## Controller
