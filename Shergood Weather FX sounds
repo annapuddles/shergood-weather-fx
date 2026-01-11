@@ -1,0 +1,6 @@
+# Sounds
+# This notecard contains the sounds and volumes used for different types of weather.
+# The sound UUID and volume will be passed to all emitters.
+-RA 0a9e0db8-25ef-14e0-9e57-b4fc43343028 0.3
+RA 0a9e0db8-25ef-14e0-9e57-b4fc43343028 0.5
++RA 0e7793f5-2244-e0e8-080f-15bf742f99e9 0.7
