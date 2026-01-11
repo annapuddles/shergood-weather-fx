@@ -1,4 +1,4 @@
-// Shergood Weather FX v0.8.0
+// Shergood Weather FX v0.9.0
 // Environment control based on Shergood METAR weather data
 
 // CONFIGURATION
@@ -22,8 +22,8 @@ list settings_notecards = [
 // The ICAO of the nearest airport
 string icao;
 
-// Enable Christmas mode
-integer christmas_mode = FALSE;
+// Enable Holiday Mode (always snowing)
+integer holiday_mode = FALSE;
 
 // Channel for METAR weather emitter and ground layer messages
 integer swfx_emitter_channel = -77737413;
@@ -507,9 +507,9 @@ default
                     {
                         set_environment = (integer) setting_value;
                     }
-                    else if (setting_name == "christmas_mode")
+                    else if (setting_name == "holiday_mode")
                     {
-                        christmas_mode = (integer) setting_value;
+                        holiday_mode = (integer) setting_value;
                     }
                 }
                 else if (notecard_name == cloud_cover_notecard)
@@ -621,7 +621,7 @@ default
         integer dewpoint = llList2Integer(parsed_metar, 12);
         string altimeter = llList2String(parsed_metar, 13);
         
-        if (christmas_mode)
+        if (holiday_mode)
         {
             if (weather == "RN")
             {
@@ -640,7 +640,7 @@ default
         // DEBUG: override METAR data for testing
         //cloud_type = "FEW";
         //weather = "-RA";
-        //christmas_mode = 0;
+        //holiday_mode = 0;
         //visibility = 0;
         
         // Relay parsed METAR data to links and other objects in the region
@@ -749,7 +749,7 @@ default
             }
             
             integer texture_index;
-            if (christmas_mode)
+            if (holiday_mode)
             {
                 texture_index = llListFindStrided(ground_textures, ["+SN"], 0, -1, 3);
             }
