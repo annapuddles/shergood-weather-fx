@@ -23,5 +23,5 @@ max_visibility = 5
 # The minimum visibility value that affects the environment.
 min_visibility = 0.7
 
-# Whether to enable Christmas Mode (always snowing).
-christmas_mode = 0
+# Whether to enable Holiday Mode (always snowing).
+holiday_mode = 0
