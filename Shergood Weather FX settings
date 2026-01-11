@@ -1,0 +1,27 @@
+# The ICAO code of the airport to fetch METAR data from. Leave commented out to use the nearest airport.
+#icao = SLWS
+
+# The channel used to communicate with the emitters and ground layers.
+swfx_emitter_channel = -77737413
+
+# The channel used to relay METAR data in a parsed format.
+metar_relay_channel = -77737412
+
+# The Shergood API URL
+api = https://shergoodaviation.com/ajax/ajax-misc.php
+
+# How often to request METAR data in seconds
+request_interval = 60
+
+# Whether to attempt to change environment settings.
+# The controller must be owned by the owner of the parcel, and an environment must be set for the parcel in order for this to work.
+set_environment = 1
+
+# The maximum visibility value that affects the environment.
+max_visibility = 5
+
+# The minimum visibility value that affects the environment.
+min_visibility = 0.7
+
+# Whether to enable Christmas Mode (always snowing).
+christmas_mode = 0
