@@ -1,10 +1,29 @@
-// Shergood Weather FX v0.2.0
+// Shergood Weather FX v0.8.0
 // Environment control based on Shergood METAR weather data
 
 // CONFIGURATION
 
+// The names of the settings notecards
+string settings_notecard = "Shergood Weather FX settings";
+string cloud_cover_notecard = "Shergood Weather FX cloud cover";
+string sounds_notecard = "Shergood Weather FX sounds";
+string ground_textures_notecard = "Shergood Weather FX ground textures";
+string airports_notecard = "Shergood Weather FX airports";
+
+// The sequence in which to read the settings notecards
+list settings_notecards = [
+    settings_notecard,
+    cloud_cover_notecard,
+    sounds_notecard,
+    ground_textures_notecard,
+    airports_notecard
+];
+
 // The ICAO of the nearest airport
-string icao = "SLYN";
+string icao;
+
+// Enable Christmas mode
+integer christmas_mode = FALSE;
 
 // Channel for METAR weather emitter and ground layer messages
 integer swfx_emitter_channel = -77737413;
@@ -18,6 +37,9 @@ string api = "https://shergoodaviation.com/ajax/ajax-misc.php";
 // How often to request an update from the Shergood server
 float request_interval = 60;
 
+// Whether to change environment settings
+integer set_environment = TRUE;
+
 // Mapping of METAR cloud types to SKY_CLOUDS cover values (min and max)
 list cloud_cover = [
     "CLR", 0.0, 0.05,
@@ -28,7 +50,7 @@ list cloud_cover = [
 ];
 
 // The maximum visibility value that will have an effect
-integer max_visibility = 5;
+float max_visibility = 5;
 
 // When visibility = 0, adjust it to this instead
 float min_visibility = 0.7;
@@ -230,9 +252,9 @@ list ground_textures = [
     "-RA", "af8c86bd-c377-c331-7476-58abeb7af8fc", 0.1,
     "RA", "af8c86bd-c377-c331-7476-58abeb7af8fc", 0.15,
     "+RA", "af8c86bd-c377-c331-7476-58abeb7af8fc", 0.2,
-    "-SN", "67c5e851-cac9-ff48-635d-d33420ceb9b8", 0.3,
-    "SN", "67c5e851-cac9-ff48-635d-d33420ceb9b8", 0.4,
-    "+SN", "67c5e851-cac9-ff48-635d-d33420ceb9b8", 0.5
+    "-SN", "d3cb47a3-595b-d2bb-599a-66bb1116674a", 0.3,
+    "SN", "d3cb47a3-595b-d2bb-599a-66bb1116674a", 0.4,
+    "+SN", "d3cb47a3-595b-d2bb-599a-66bb1116674a", 0.5
 ];
 
 // END OF CONFIGURATION
@@ -248,6 +270,41 @@ integer last_visibility = -1;
 
 // The ID of the HTTP request to the API
 key http_request_id;
+
+// Index of the current settings notecard being read
+integer settings_notecards_index = -1;
+
+// Used for reading notecards
+string notecard_name;
+key notecard_query;
+integer notecard_line;
+
+// The distance of the closest airport found so far
+float closest_airport_distance;
+
+// Read the next settings notecard, return true if there is one or false if there is not
+integer read_next_settings_notecard()
+{
+    integer n = llGetListLength(settings_notecards);
+    
+    for (++settings_notecards_index; settings_notecards_index < n; ++settings_notecards_index)
+    {
+        string notecard = llList2String(settings_notecards, settings_notecards_index);
+        
+        if (notecard == airports_notecard && icao != "")
+        {
+            return FALSE;
+        }
+        
+        if (llGetInventoryType(notecard) == INVENTORY_NOTECARD)
+        {   
+            notecard_query = llGetNotecardLine(notecard_name = notecard, notecard_line = 0);
+            return TRUE;
+        }
+    }
+    
+    return FALSE;
+}
 
 // Make a request to the Shergood METAR API
 request_metar()
@@ -380,6 +437,13 @@ list get_haze(float visibility)
     ];
 }
 
+start()
+{    
+    // Perform the initial request then set up a timer to do periodic updates
+    request_metar();
+    llSetTimerEvent(request_interval);
+}
+
 default
 {
     state_entry()
@@ -387,9 +451,134 @@ default
         // Show the free script memory in chat
         llOwnerSay("Free memory: " + (string) llGetFreeMemory());
         
-        // Perform the initial request then set up a timer to do periodic updates
-        request_metar();
-        llSetTimerEvent(request_interval);
+        if (!read_next_settings_notecard())
+        {
+            start();
+        }
+    }
+    
+    dataserver(key query_id, string data)
+    {
+        if (query_id != notecard_query)
+        {
+            return;
+        }
+        
+        while (data != EOF && data != NAK)
+        {
+            if (data != "" && llGetSubString(data, 0, 0) != "#")
+            {
+                if (notecard_name == settings_notecard)
+                {
+                    list parts = llParseStringKeepNulls(data, [" = "], []);
+                    
+                    string setting_name = llList2String(parts, 0);
+                    string setting_value = llList2String(parts, 1);
+                    
+                    if (setting_name == "icao")
+                    {
+                        icao = setting_value;
+                    }
+                    else if (setting_name == "swfx_emitter_channel")
+                    {
+                        swfx_emitter_channel = (integer) setting_value;
+                    }
+                    else if (setting_name == "metar_relay_channel")
+                    {
+                        metar_relay_channel = (integer) metar_relay_channel;
+                    }
+                    else if (setting_name == "api")
+                    {
+                        api = setting_value;
+                    }
+                    else if (setting_name == "request_interval")
+                    {
+                        request_interval = (integer) setting_value;
+                    }
+                    else if (setting_name == "max_visibility")
+                    {
+                        max_visibility = (float) setting_value;
+                    }
+                    else if (setting_name == "min_visibility")
+                    {
+                        min_visibility = (float) setting_value;
+                    }
+                    else if (setting_name == "set_environment")
+                    {
+                        set_environment = (integer) setting_value;
+                    }
+                    else if (setting_name == "christmas_mode")
+                    {
+                        christmas_mode = (integer) setting_value;
+                    }
+                }
+                else if (notecard_name == cloud_cover_notecard)
+                {
+                    list parts = llParseStringKeepNulls(data, [" "], []);
+                    
+                    string clouds = llList2String(parts, 0);
+                    float min = (float) llList2String(parts, 1);
+                    float max = (float) llList2String(parts, 2);
+                    
+                    cloud_cover += [clouds, min, max];
+                }
+                else if (notecard_name == sounds_notecard)
+                {
+                    list parts = llParseStringKeepNulls(data, [" "], []);
+                    
+                    string weather = llList2String(parts, 0);
+                    key uuid = (key) llList2String(parts, 1);
+                    float vol = (float) llList2String(parts, 2);
+                    
+                    sounds += [weather, uuid, vol];
+                }
+                else if (notecard_name == ground_textures_notecard)
+                {
+                    list parts = llParseStringKeepNulls(data, [" "], []);
+                    
+                    string weather = llList2String(parts, 0);
+                    key uuid = (key) llList2String(parts, 1);
+                    float alpha = (float) llList2String(parts, 2);
+                    
+                    ground_textures += [weather, uuid, alpha];
+                }
+                else if (notecard_name == airports_notecard)
+                {
+                    list parts = llParseStringKeepNulls(data, [" "], []);
+                    
+                    float x1 = (float) llList2String(parts, 0);
+                    float y1 = (float) llList2String(parts, 1);
+                    string code = llList2String(parts, 2);
+                    
+                    vector pos = llGetRegionCorner() + llGetPos();
+                    float x2 = pos.x / 256;
+                    float y2 = pos.y / 256;
+                    
+                    float dist = llVecDist(<x1, y1, 0>, <x2, y2, 0>);
+                                    
+                    if (icao == "" || dist < closest_airport_distance)
+                    {
+                        icao = code;
+                        closest_airport_distance = dist;
+                    }
+                }
+            }
+            
+            data = llGetNotecardLineSync(notecard_name, ++notecard_line);
+        }
+        
+        if (data == NAK)
+        {
+            notecard_query = llGetNotecardLine(notecard_name, notecard_line);
+        }
+        
+        if (data == EOF)
+        {
+            if (!read_next_settings_notecard())
+            {
+                start();
+            }
+        }
     }
     
     timer()
@@ -401,6 +590,12 @@ default
     {
         // Ignore responses to any other requests
         if (request_id != http_request_id)
+        {
+            return;
+        }
+        
+        // If the request failed, skip it
+        if (status != 200)
         {
             return;
         }
@@ -426,9 +621,26 @@ default
         integer dewpoint = llList2Integer(parsed_metar, 12);
         string altimeter = llList2String(parsed_metar, 13);
         
+        if (christmas_mode)
+        {
+            if (weather == "RN")
+            {
+                weather = "SN";
+            }
+            else if (weather == "+RN")
+            {
+                weather = "+SN";
+            }
+            else
+            {
+                weather = "-SN";
+            }
+        }
+        
         // DEBUG: override METAR data for testing
         //cloud_type = "FEW";
-        //weather = "SN";
+        //weather = "-RA";
+        //christmas_mode = 0;
         //visibility = 0;
         
         // Relay parsed METAR data to links and other objects in the region
@@ -452,37 +664,39 @@ default
         llRegionSay(metar_relay_channel, data);
         
         // Alter the environment settings based on the Shergood METAR data
-        
-        // Check if any relevant data changed and thus an environment adjustment is needed
-        if (cloud_type != last_cloud_type || visibility != last_visibility)
+        if (set_environment)
         {
-            // Get the current environment settings
-            list environment = llGetEnvironment(llGetPos(), [SKY_CLOUDS, SKY_HAZE]);
-            
-            // Remove values not used in llSetEnvironment
-            // SKY_CLOUDS is_default
-            environment = llDeleteSubList(environment, 7, 7);
-            
-            // Add llSetEnvironment constants
-            environment = [SKY_CLOUDS] + environment;
-            environment = llListInsertList(environment, [SKY_HAZE], 8);
-            
-            // Modify the parameters based on the Shergood METAR data
-            // SKY_CLOUDS cover
-            environment = llListReplaceList(environment, [get_cloud_cover(cloud_type)], 2, 2);
-            // SKY_HAZE horizon
-            environment = llListReplaceList(environment, get_haze(visibility), 9, 12);
-            
-            // Apply the environment parameters
-            integer err = llSetEnvironment(llGetPos(), environment);
-            if (err != 1)
+            // Check if any relevant data changed and thus an environment adjustment is needed
+            if (cloud_type != last_cloud_type || visibility != last_visibility)
             {
-                llOwnerSay("llSetEnvironment failed: " + (string) err);
+                // Get the current environment settings
+                list environment = llGetEnvironment(llGetPos(), [SKY_CLOUDS, SKY_HAZE]);
+                
+                // Remove values not used in llSetEnvironment
+                // SKY_CLOUDS is_default
+                environment = llDeleteSubList(environment, 7, 7);
+                
+                // Add llSetEnvironment constants
+                environment = [SKY_CLOUDS] + environment;
+                environment = llListInsertList(environment, [SKY_HAZE], 8);
+                
+                // Modify the parameters based on the Shergood METAR data
+                // SKY_CLOUDS cover
+                environment = llListReplaceList(environment, [get_cloud_cover(cloud_type)], 2, 2);
+                // SKY_HAZE horizon
+                environment = llListReplaceList(environment, get_haze(visibility), 9, 12);
+                
+                // Apply the environment parameters
+                integer err = llSetEnvironment(llGetPos(), environment);
+                if (err != 1)
+                {
+                    llOwnerSay("llSetEnvironment failed: " + (string) err);
+                }
+                
+                // Record relevant data to compare next update
+                last_cloud_type = cloud_type;
+                last_visibility = visibility;
             }
-            
-            // Record relevant data to compare next update
-            last_cloud_type = cloud_type;
-            last_visibility = visibility;
         }
         
         // Relay particle data and sounds to METAR weather nodes
@@ -534,7 +748,15 @@ default
                 volume = llList2Float(sounds, sound_index + 2);
             }
             
-            integer texture_index = llListFindStrided(ground_textures, [weather], 0, -1, 3);
+            integer texture_index;
+            if (christmas_mode)
+            {
+                texture_index = llListFindStrided(ground_textures, ["+SN"], 0, -1, 3);
+            }
+            else
+            {
+                texture_index = llListFindStrided(ground_textures, [weather], 0, -1, 3);
+            }
             if (texture_index != -1)
             {
                 texture = llList2String(ground_textures, texture_index + 1);
