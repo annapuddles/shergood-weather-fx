@@ -1,0 +1,9 @@
+# Ground textures
+# This notecard contains the list of ground textures and alpha values for each type of weather.
+# The texture UUID will be applied with the given alpha value to all ground layers.
+-RA af8c86bd-c377-c331-7476-58abeb7af8fc 0.1
+RA af8c86bd-c377-c331-7476-58abeb7af8fc 0.15
++RA af8c86bd-c377-c331-7476-58abeb7af8fc 0.2
+-SN d3cb47a3-595b-d2bb-599a-66bb1116674a 0.3
+SN d3cb47a3-595b-d2bb-599a-66bb1116674a 0.4
++SN d3cb47a3-595b-d2bb-599a-66bb1116674a 0.5
