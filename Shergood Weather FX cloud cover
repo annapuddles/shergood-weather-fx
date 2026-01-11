@@ -1,0 +1,8 @@
+# Cloud cover settings
+# Each line represents the minimum and maximum cloud cover value for each type of clouds.
+# Example: CLR 0.0 0.5 means that when clouds are clear, the actual cloud cover set will be between 0.0 and 0.5.
+CLR 0.0 0.05
+FEW 0.1 0.15
+SCT 0.2 0.3
+BKN 0.3 0.35
+OVC 0.4 0.5
