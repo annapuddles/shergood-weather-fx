@@ -1,4 +1,4 @@
-// Shergood Weather FX Ground Layer v0.2.0
+// Shergood Weather FX Ground Layer v1.0.0
 
 // Channel for METAR weather emitter messages
 integer swfx_emitter_channel = -77737413;
