@@ -1,4 +1,4 @@
-// Shergood Weather FX Emitter v0.2.0
+// Shergood Weather FX Emitter v1.1.0
 // Emits particles and sounds based on commands from the Shergood Weather FX controller.
 
 // CONFIGURATION
@@ -57,7 +57,7 @@ default
             {
                 if (sound != "")
                 {
-                    llLinkPlaySound(n, sound, volume, SOUND_LOOP);
+                    llLinkPlaySound(n, sound, volume + (llFrand(0.2) - 0.1), SOUND_LOOP);
                 }
                 llSleep(llFrand(0.5) + 0.5);
             }
