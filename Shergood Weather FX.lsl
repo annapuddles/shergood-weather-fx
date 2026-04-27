@@ -1,4 +1,4 @@
-// Shergood Weather FX v1.0.0
+// Shergood Weather FX v1.1.0
 // Environment control based on Shergood METAR weather data
 
 // CONFIGURATION
@@ -688,14 +688,19 @@ default
                 
                 // Apply the environment parameters
                 integer err = llSetEnvironment(llGetPos(), environment);
-                if (err != 1)
+                
+                // llSetEnvironment was successful
+                if (err == 1)
+                {
+                    // Record relevant data to compare next update
+                    last_cloud_type = cloud_type;
+                    last_visibility = visibility;
+                }
+                // llSetEnvironment failed for some reason
+                else
                 {
                     llOwnerSay("llSetEnvironment failed: " + (string) err);
                 }
-                
-                // Record relevant data to compare next update
-                last_cloud_type = cloud_type;
-                last_visibility = visibility;
             }
         }
         
