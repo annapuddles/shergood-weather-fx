@@ -1,4 +1,4 @@
-// Shergood Weather FX v0.9.0
+// Shergood Weather FX v1.0.0
 // Environment control based on Shergood METAR weather data
 
 // CONFIGURATION
