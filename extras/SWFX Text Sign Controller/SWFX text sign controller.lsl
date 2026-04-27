@@ -1,11 +1,10 @@
 // SWFX text sign controller v1.0.0
 
 // This script display the Shergood METAR info on a [GenTek] InfoCenter Highway sign.
+// Place it in the same object as the Shergood Weather FX script.
 
-// Place it in the same object as the Shergood Weather FX script, and add the
-// keys of the signs you want to display the messages on in the list below:
-list signs = [
-];
+// The name of the notecard containing a list of sign keys
+string signs_notecard = "SWFX Text Signs";
 
 // GenTek sign API channel
 integer sign_channel = -495310229;
@@ -35,6 +34,9 @@ list precip = [
 
 // Panel to start from
 integer panel = 0;
+
+// List of keys of signs to send messages to
+list signs;
 
 string align(string in, string dir, integer length, string pad)
 {
@@ -153,7 +155,7 @@ next()
         integer hpa = (integer) (inhg * 33.863889532611);
         broadcast([
             align("* PRESSURE *", "", 16, "") +
-            align(llJsonGetValue(metar, ["altimeter"]) +" inHg", "", 16, "") +
+            align(alt +" inHg", "", 16, "") +
             align((string) hpa + " hPa", "", 16, "") +
             align("", "", 16, "O") +
             align("", "", 32, "W")
@@ -161,9 +163,12 @@ next()
     }
     else if (panel == 5)
     {
+        string vis = llJsonGetValue(metar, ["visibility"]);
+        integer mi = (integer) vis;
+        integer km = (integer) (mi * 1.60934);
         broadcast([
             align("* VISIBILITY *", "", 16, "") +
-            align(llJsonGetValue(metar, ["visibility"]) + " MI", "", 16, "") +
+            align(vis + " MI / " + (string) km + " KM", "", 16, "") +
             align("", "", 16, "") +
             align("", "", 16, "O") +
             align("", "", 32, "W")
@@ -219,12 +224,57 @@ next()
     panel = (panel + 1) % 9;
 }
 
+// Begin sending messages to the signs
+start()
+{
+    next();
+    llSetTimerEvent(interval);
+}
+
+// For reading the signs notecard
+key notecard_query;
+integer notecard_line;
+
 default
 {
     state_entry()
     {
-        next();
-        llSetTimerEvent(interval);
+        if (llGetInventoryType(signs_notecard) == INVENTORY_NOTECARD)
+        {
+            notecard_query = llGetNotecardLine(signs_notecard, notecard_line = 0);
+        }
+        else
+        {
+            start();
+        }
+    }
+    
+    dataserver(key query_id, string data)
+    {
+        if (query_id != notecard_query)
+        {
+            return;
+        }
+        
+        while (data != EOF && data != NAK)
+        {
+            if (data != "" && llGetSubString(data, 0, 0) != "#")
+            {
+                signs += (key) data;
+            }
+            
+            data = llGetNotecardLineSync(signs_notecard, ++notecard_line);
+        }
+        
+        if (data == NAK)
+        {
+            notecard_query = llGetNotecardLine(signs_notecard, notecard_line);
+        }
+        
+        if (data == EOF)
+        {
+            start();
+        }
     }
     
     link_message(integer sender, integer num, string str, key id)
