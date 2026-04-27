@@ -439,7 +439,7 @@ list get_haze(float visibility)
 
 start()
 {
-    llOwnerSay("Weather info will be synced with " + icao);
+    llOwnerSay(llGetScriptName() + ": Weather info will be synced with " + icao);
     
     // Perform the initial request then set up a timer to do periodic updates
     request_metar();
@@ -451,7 +451,7 @@ default
     state_entry()
     {
         // Show the free script memory in chat
-        llOwnerSay("Free memory: " + (string) llGetFreeMemory());
+        llOwnerSay(llGetScriptName() + ": Free memory: " + (string) llGetFreeMemory());
         
         if (!read_next_settings_notecard())
         {
@@ -701,7 +701,7 @@ default
                 // llSetEnvironment failed for some reason
                 else
                 {
-                    llOwnerSay("llSetEnvironment failed: " + (string) err);
+                    llOwnerSay(llGetScriptName() + ": llSetEnvironment failed: " + (string) err);
                 }
             }
         }
