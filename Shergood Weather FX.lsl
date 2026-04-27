@@ -438,7 +438,9 @@ list get_haze(float visibility)
 }
 
 start()
-{    
+{
+    llOwnerSay("Weather info will be synced with " + icao);
+    
     // Perform the initial request then set up a timer to do periodic updates
     request_metar();
     llSetTimerEvent(request_interval);
