@@ -22,8 +22,8 @@ The ground layers add a texture overlay on the ground based on the current weath
 
 You may have multiple ground layers and/or a single ground layer with multiple linked prims, depending on how wide a space you need to cover. Ground layers always display their textures on face 0.
 
-## Extras
+# Extras
 
-### SWFX Text Sign Controller
+## SWFX Text Sign Controller
 
 An extra script that can display the weather information on a [GenTek] InfoCenter Highway sign has been included. Place the script and notecard in the same object as the controller script and add the keys of the signs you want to display the messages on in the notecard (one key per line).
