@@ -781,4 +781,9 @@ default
             last_weather = weather;
         }
     }
+    
+    on_rez(integer start_param)
+    {
+        llResetScript();
+    }
 }
