@@ -135,14 +135,18 @@ next()
     else if (panel == 3)
     {
         integer windspeed = (integer) llJsonGetValue(metar, ["windSpeed"]);
-        string dir;
+        string desc;
         if (windspeed > 0)
         {
-            dir = " " + get_wind_dir((integer) llJsonGetValue(metar, ["windDirection"]));
+            desc = (string) windspeed + "KTS " + get_wind_dir((integer) llJsonGetValue(metar, ["windDirection"]));
+        }
+        else
+        {
+            desc = "CALM";
         }
         broadcast([
             align("* WIND *", "", 16, "") +
-            align((string) windspeed + " KTS" + dir, "", 16, "") +
+            align((string) windspeed + " KTS" + desc, "", 16, "") +
             align("", "", 16, "") +
             align("", "", 16, "O") +
             align("", "", 32, "W")
