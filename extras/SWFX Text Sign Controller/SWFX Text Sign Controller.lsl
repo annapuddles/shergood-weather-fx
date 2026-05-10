@@ -1,4 +1,4 @@
-// SWFX text sign controller v1.0.0
+// SWFX text sign controller v1.0.1
 
 // This script display the Shergood METAR info on a [GenTek] InfoCenter Highway sign.
 // Place it in the same object as the Shergood Weather FX script.
@@ -146,7 +146,7 @@ next()
         }
         broadcast([
             align("* WIND *", "", 16, "") +
-            align((string) windspeed + " KTS" + desc, "", 16, "") +
+            align(desc, "", 16, "") +
             align("", "", 16, "") +
             align("", "", 16, "O") +
             align("", "", 32, "W")
