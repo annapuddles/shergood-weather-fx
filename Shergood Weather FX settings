@@ -23,5 +23,8 @@ max_visibility = 5
 # The minimum visibility value that affects the environment.
 min_visibility = 0.7
 
+# Enable HD Fire interactions
+hd_fire = 0
+
 # Whether to enable Holiday Mode (always snowing).
 holiday_mode = 0
