@@ -1,0 +1,30 @@
+# They key of the sign to show messages on. You can specify multiple keys for multiple signs.
+key = 7b94d500-c6a9-8772-32b7-1d7bc3744ce2
+key = 40326359-81d1-28f9-9420-31cdbde89864
+
+# How long to display each panel on the sign in seconds
+interval = 10
+
+# The first line on the intro panel (max 16 characters)
+intro_line_1 = WELCOME  TO
+
+# The second line on the intro panel (max 16 characters)
+intro_line_2 = HYENA HELIPORT
+
+# The third line on the intro panel (max 16 characters)
+intro_line_3 = <<< SLYN >>>
+
+# Colors of each character on the intro panel. There must be exactly 48 color characters.
+intro_colors = WWWWWWWWWWWWWWWWOOOOOOOOOOOOOOOOWWWWWWBBBBWWWWWW
+
+# The first line of the outro panel (max 16 characters)
+outro_line_1 = THANK YOU
+
+# The second line of the outro panel (max 16 characters)
+outro_line_2 = AND HAVE
+
+# The third line of the outro panel (max 16 characters)
+outro_line_3 = A PLEASANT TRIP!
+
+# Colors of each character on the outro panel. There must be exactly 48 color characters.
+outro_colors = PPPPPPPPPPPPPPPPAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
