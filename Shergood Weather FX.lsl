@@ -1,4 +1,4 @@
-// Shergood Weather FX v1.1.0
+// Shergood Weather FX v1.2.0
 // Environment control based on Shergood METAR weather data
 
 // CONFIGURATION
@@ -36,6 +36,9 @@ string api = "https://shergoodaviation.com/ajax/ajax-misc.php";
 
 // How often to request an update from the Shergood server
 float request_interval = 60;
+
+// Whether to enable HD Fire interaction
+integer hd_fire = FALSE;
 
 // Whether to change environment settings
 integer set_environment = TRUE;
@@ -509,6 +512,10 @@ default
                     {
                         set_environment = (integer) setting_value;
                     }
+                    else if (setting_name == "hd_fire")
+                    {
+                        hd_fire = (integer) setting_value;
+                    }
                     else if (setting_name == "holiday_mode")
                     {
                         holiday_mode = (integer) setting_value;
@@ -781,6 +788,11 @@ default
             
             // Record the weather to check if it changed next update
             last_weather = weather;
+        }
+        
+        if (hd_fire && (weather == "-RA" || weather == "RA" || weather == "+RA"))
+        {
+            llRegionSay(swfx_emitter_channel, "hd_fire_check");
         }
     }
     
