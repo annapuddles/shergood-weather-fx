@@ -1,4 +1,4 @@
-# Airports (updated 2026-07-29)
+# Airports (updated 2026-08-27)
 # This notecard contains a list of the positions of all registered airports.
 # This is used to detect the nearest airport to the parcel where the controller is placed.
 464 1709 SLGR
@@ -111,7 +111,6 @@
 1112 1091 SLSD
 1113 1031 SLZM
 1113 1043 SLKX
-1114 1057 SLTH
 1115 1067 SLMS
 1116 1072 SLBS
 1118 1040 SLNB
@@ -122,7 +121,7 @@
 1120 1050 SLCW
 1120 1054 SLDF
 1120 1059 AFD
-1121 1042 GCH
+1120 1096 SLWB
 1121 1045 SLWE
 1121 1056 SLWO
 1121 1079 SLDP
@@ -146,6 +145,7 @@
 1127 1050 SLMG
 1127 1087 SLHB
 1127 1088 SLAA
+1128 1052 SLFA
 1128 1059 SLHX
 1128 1066 SLMP
 1130 1046 SLBH
