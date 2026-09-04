@@ -1,4 +1,4 @@
-// Shergood Weather FX Ground Layer v1.0.0
+// Shergood Weather FX Ground Layer v1.0.1
 
 // Channel for METAR weather emitter messages
 integer swfx_emitter_channel = -77737413;
@@ -20,6 +20,12 @@ default
         }
         
         string texture = llJsonGetValue(message, ["texture"]);
+        
+        if (texture == JSON_INVALID)
+        {
+            return;
+        }
+        
         float alpha = (float) llJsonGetValue(message, ["alpha"]);
         
         if (texture == "")

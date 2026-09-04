@@ -1,10 +1,10 @@
-// SWFX text sign controller v1.0.2
+// SWFX text sign controller v2.0.0
 
 // This script display the Shergood METAR info on a [GenTek] InfoCenter Highway sign.
 // Place it in the same object as the Shergood Weather FX script.
 
 // The name of the notecard containing a list of sign keys
-string signs_notecard = "SWFX Text Signs";
+string settings_notecard = "SWFX Text Sign Controller settings";
 
 // GenTek sign API channel
 integer sign_channel = -495310229;
@@ -34,6 +34,18 @@ list precip = [
 
 // Panel to start from
 integer panel = 0;
+
+// Customize the intro panel text
+string intro_line_1 = "WELCOME  TO";
+string intro_line_2 = "HYENA HELIPORT";
+string intro_line_3 = "<<< SLYN >>>";
+string intro_colors = "WWWWWWWWWWWWWWWWOOOOOOOOOOOOOOOOWWWWWWBBBBWWWWWW";
+
+// Customize the outro panel text
+string outro_line_1 = "THANK YOU";
+string outro_line_2 = "AND HAVE";
+string outro_line_3 = "A PLEASANT TRIP!";
+string outro_colors = "PPPPPPPPPPPPPPPPAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 
 // List of keys of signs to send messages to
 list signs;
@@ -101,12 +113,10 @@ next()
     if (panel == 0)
     {
         broadcast([
-            align("WELCOME  TO", "", 16, "") +
-            align("HYENA HELIPORT", "", 16, "") +
-            align("<<< SLYN >>>", "", 16, "") +
-            align("", "", 16, "W") +
-            align("", "", 16, "O") +
-            "WWWWWWBBBBWWWWWW"
+            align(intro_line_1, "", 16, "") +
+            align(intro_line_2, "", 16, "") +
+            align(intro_line_3, "", 16, "") +
+            intro_colors
         ]);
     }
     else if (panel == 1)
@@ -213,15 +223,10 @@ next()
     else if (panel == 8)
     {
         broadcast([
-            align("THANK YOU", "", 16, "") +
-            align("AND HAVE", "", 16, "") +
-            align("A PLEASANT TRIP!", "", 16, "") +
-            //align("AND", "", 16, "") +
-            //align("HAPPY HOLIDAYS!", "", 16, "") +
-            align("", "", 16, "P") +
-            align("", "", 32, "A")
-            //align("", "", 16, "A") +
-            //align("", "", 5, "R") + align("", "", 11, "G")
+            align(outro_line_1, "", 16, "") +
+            align(outro_line_2, "", 16, "") +
+            align(outro_line_3, "", 16, "") +
+            outro_colors
         ]);
     }
     
@@ -243,9 +248,9 @@ default
 {
     state_entry()
     {
-        if (llGetInventoryType(signs_notecard) == INVENTORY_NOTECARD)
+        if (llGetInventoryType(settings_notecard) == INVENTORY_NOTECARD)
         {
-            notecard_query = llGetNotecardLine(signs_notecard, notecard_line = 0);
+            notecard_query = llGetNotecardLine(settings_notecard, notecard_line = 0);
         }
         else
         {
@@ -264,15 +269,62 @@ default
         {
             if (data != "" && llGetSubString(data, 0, 0) != "#")
             {
-                signs += (key) data;
+                list parts = llParseString2List(data, [" = "], []);
+                string setting_name = llList2String(parts, 0);
+                string setting_value = llList2String(parts, 1);
+                
+                if (setting_name == "interval")
+                {
+                    interval = (float) setting_value;
+                }
+                else if (setting_name == "key")
+                {
+                    signs += (key) setting_value;
+                }
+                else if (setting_name == "intro_line_1")
+                {
+                    intro_line_1 = setting_value;
+                }
+                else if (setting_name == "intro_line_2")
+                {
+                    intro_line_2 = setting_value;
+                }
+                else if (setting_name == "intro_line_3")
+                {
+                    intro_line_3 = setting_value;
+                }
+                else if (setting_name == "intro_colors")
+                {
+                    intro_colors = setting_value;
+                }
+                else if (setting_name == "outro_line_1")
+                {
+                    outro_line_1 = setting_value;
+                }
+                else if (setting_name == "outro_line_2")
+                {
+                    outro_line_2 = setting_value;
+                }
+                else if (setting_name == "outro_line_3")
+                {
+                    outro_line_3 = setting_value;
+                }
+                else if (setting_name == "outro_colors")
+                {
+                    outro_colors = setting_value;
+                }
+                else if (setting_name == "sign_channel")
+                {
+                    sign_channel = (integer) setting_value;
+                }
             }
             
-            data = llGetNotecardLineSync(signs_notecard, ++notecard_line);
+            data = llGetNotecardLineSync(settings_notecard, ++notecard_line);
         }
         
         if (data == NAK)
         {
-            notecard_query = llGetNotecardLine(signs_notecard, notecard_line);
+            notecard_query = llGetNotecardLine(settings_notecard, notecard_line);
         }
         
         if (data == EOF)
